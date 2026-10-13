@@ -256,8 +256,8 @@ function OverviewPanel() {
         <span className="online-pill"><i /> Reach me freely with purpose</span>
       </div>
       <p className="profile-summary">
-        I&apos;m Ria — current 3rd year IT Student. I play to compete,
-        connect, and learn, while building digital experiences that make communities more useful,
+        Hey there! I&apos;m Ria — current 3rd year IT Student at NU Dasma. I play to compete,
+        connect, and have fun, while building and exploring digital experiences that make communities more useful,
         welcoming, and fun.
       </p>
       <div className="cv-columns">
@@ -287,13 +287,13 @@ function OverviewPanel() {
 function GamingPanel() {
   const roles = [
     {
-      date: "MAIN GAME",
+      date: "Game 01",
       role: "Valorant",
       company: "Peak: Asc 1 · Controller / Initiator",
       details: "Laro lang until mapikon XD",
     },
     {
-      date: "SECONDARY",
+      date: "Game 02",
       role: "Roblox",
       company: "Pang alis umay",
       details: "Makipag away sa bata LOL",
@@ -325,8 +325,9 @@ function GamingPanel() {
 function AboutPanel() {
   const groups = [
     ["01", "In Game", ["Yapper", "Tilted", "Play for fun",]],
-    ["02", "At Org", ["Facilitator", "Event organizer", "Alto Singer", "Records & Archives"]],
+    ["02", "At Org", ["Facilitator", "Event organizer", "Alto Singer", "Records & Archives", "Executive Secretary",]],
     ["03", "Off Screen", ["IT Student", "Sleeper", "Matcha",]],
+    ["04", "At University", ["Hungry", "Tired", "Wala akong choice lagi",]],
   ] as const;
 
   return (
@@ -356,8 +357,8 @@ function PortfolioPanel() {
   return (
     <section className="content-panel">
       <div className="panel-heading">
-        <div><span className="overline">Side Quest</span><h2>Portfolio</h2></div>
-        <span className="rank-badge">Past Projects?</span>
+        <div><span className="overline">Side Quest</span><h2>Things I did for the past</h2></div>
+        <span className="rank-badge">Past Projects?Org histories?</span>
       </div>
       <div className="timeline">
         {projects.map((item, index) => (
