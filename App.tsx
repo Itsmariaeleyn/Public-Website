@@ -25,12 +25,40 @@ const cacheImage = (key: string, value: string) => {
 
 const projects = [
   {
-    name: "ThriftLoop",
-    detail: "Curated Online Thrift Shop",
+    name: "PRJ - ThriftLoop",
+    detail: "Curated Online Thrift Shop . 2026",
   },
   {
-    name: "CLINIQ",
-    detail: "Online Clinic Booking System",
+    name: "PRJ - CLINIQ",
+    detail: "Online Clinic Booking System . 2026",
+  },
+  {
+    name: "Org -NUD Student Government",
+    detail: " AudioVisual Member. 2025",
+  },
+  {
+    name: "Org - NUD Symphony",
+    detail: "Executive Secretary. 2026",
+  },
+  {
+    name: "Org - NUD Symphony",
+    detail: "Secretariant Committee. 2025 - 2026",
+  },
+  {
+    name: "Org - NUD Sigma Esports",
+    detail: " OSEC - Records & Archives. 2026",
+  },
+   {
+    name: "Org - NUD Sigma Esports",
+    detail: " Event Committee. 2025 - 2026",
+  },
+   {
+    name: "Org - NUD Sigma Esports",
+    detail: " Logistics Committee. 2024 - 2025",
+  },
+  {
+    name: "Org - NUD Comsoc",
+    detail: " AudioVisual Coordinator. 2024 - 2025",
   },
 ];
 
@@ -357,7 +385,7 @@ function PortfolioPanel() {
   return (
     <section className="content-panel">
       <div className="panel-heading">
-        <div><span className="overline">Side Quest</span><h2>Things I did for the past</h2></div>
+        <div><span className="overline">Side Quest</span><h2>Things I did from the past</h2></div>
         <span className="rank-badge">Past Projects?Org histories?</span>
       </div>
       <div className="timeline">
