@@ -23,7 +23,7 @@ const cacheImage = (key: string, value: string) => {
   }
 };
 
-const project = [
+const projects = [
   {
     name: "PRJ - ThriftLoop",
     detail: "Curated Online Thrift Shop . 2026",
