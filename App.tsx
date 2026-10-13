@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent, type PointerEvent } from "react";
-import { projectId, publicAnonKey } from "../utils/supabase/info";
+import { projectId, publicAnonKey } from "./utils/supabase/info";
 
 const galleryApi = `https://${projectId}.supabase.co/functions/v1/make-server-424cfffc`;
 
