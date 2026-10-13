@@ -3,9 +3,6 @@ import { projectId, publicAnonKey } from "./utils/supabase/info";
 
 const galleryApi = `https://${projectId}.supabase.co/functions/v1/make-server-424cfffc`;
 
-const PROFILE_IMAGE = "";
-const COVER_IMAGE =
-  "https://images.unsplash.com/photo-1777731476530-bd4e64645d16?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=600&q=85&w=1400";
 
 const getCachedImage = (key: string, fallback: string) => {
   try {
@@ -23,7 +20,7 @@ const cacheImage = (key: string, value: string) => {
   }
 };
 
-const things = [
+const project = [
   {
     name: "PRJ - ThriftLoop",
     detail: "Curated Online Thrift Shop . 2026",
