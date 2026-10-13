@@ -857,7 +857,7 @@ export default function App() {
               }
             }}
           >
-            {isOwner ? "Sign out" : "Owner access"}
+            {isOwner ? "Sign out" : "Nice seeing you here!"}
           </button>
         </footer>
       </main>
