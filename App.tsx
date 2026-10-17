@@ -251,7 +251,7 @@ function ImageCropModal({
   );
 }
 
-const tabs = ["Overview", "Gaming", "Portfolio", "Gallery", "About"];
+const tabs = ["Overview", "Gaming", "Experience", "Gallery", "About"];
 
 const StarIcon = () => (
   <svg aria-hidden="true" viewBox="0 0 24 24">
@@ -428,18 +428,18 @@ function PortfolioPanel() {
       <div className="panel-heading">
         <div>
           <span className="overline">Side Quest</span>
-          <h2>Projects &amp; Involvements</h2>
+          <h2>Projects &amp; Organizations</h2>
         </div>
         <span className="rank-badge">
           {projects.length} PROJECTS · {organizations.length} ROLES
         </span>
       </div>
 
-      <span className="overline">Projects</span>
+      <span className="overline">Projects Built</span>
       <div className="timeline">{renderItems(projects)}</div>
 
       <span className="overline" style={{ display: "block", marginTop: "1.5rem" }}>
-        Organizations
+        Organizations &amp; Roles
       </span>
       <div className="timeline">{renderItems(organizations)}</div>
     </section>
@@ -1014,7 +1014,7 @@ export default function App() {
           <div className="tab-content">
             {activeTab === "Overview" && <OverviewPanel />}
             {activeTab === "Gaming" && <GamingPanel />}
-            {activeTab === "Portfolio" && <PortfolioPanel />}
+            {activeTab === "Experience" && <PortfolioPanel />}
             {activeTab === "Gallery" && (
               <GalleryPanel ownerPassword={ownerPassword} isOwner={isOwner} />
             )}
