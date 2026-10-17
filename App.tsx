@@ -40,7 +40,7 @@ const organizations = [
   {
     name: "NUD Symphony",
     detail: "Executive Secretary",
-    period: "2026",
+    period: "2026 – Present",
   },
   {
     name: "NUD Symphony",
@@ -50,7 +50,7 @@ const organizations = [
   {
     name: "NUD Sigma Esports",
     detail: "OSEC – Records & Archives",
-    period: "2026",
+    period: "2026 – Present",
   },
   {
     name: "NUD Sigma Esports",
@@ -362,13 +362,29 @@ function GamingPanel() {
   );
 }
 
+const education = [
+  {
+    level: "Primary",
+    school: "Fiat Lux Academe – Imus",
+    detail: "Elementary to Junior High School",
+    period: "",
+  },
+  {
+    level: "Secondary",
+    school: "Emilio Aguinaldo College – Dasmariñas",
+    detail: "Senior High School",
+    period: "",
+  },
+  {
+    level: "Tertiary",
+    school: "National University – Dasmariñas",
+    detail: "Information Technology · 3rd Year",
+    period: "Present",
+  },
+];
+
 function AboutPanel() {
-  const groups = [
-    ["01", "In Game", ["Yapper", "Tilted", "Play for fun",]],
-    ["02", "At Org", ["Facilitator", "Event organizer", "Alto Singer", "Records & Archives", "Executive Secretary",]],
-    ["03", "Off Screen", ["IT Student", "Sleeper", "Matcha",]],
-    ["04", "At University", ["Hungry", "Tired", "Wala akong choice lagi",]],
-  ] as const;
+  const visibleEducation = education.filter((item) => item.school);
 
   return (
     <section className="content-panel">
@@ -376,15 +392,17 @@ function AboutPanel() {
         <div><span className="overline">The person behind the tag</span><h2>About me</h2></div>
         <span className="panel-icon"><AcademicIcon /></span>
       </div>
-      <div className="skill-groups">
-        {groups.map(([number, title, skills]) => (
-          <article key={number}>
-            <span>{number}</span>
+      <span className="overline">Education</span>
+      <div className="timeline">
+        {[...visibleEducation].reverse().map((item) => (
+          <article className="timeline-item" key={`${item.level}-${item.detail}`}>
+            <span className="timeline-date">{item.level.toUpperCase()}</span>
             <div>
-              <h3>{title}</h3>
-              <div className="skill-tags">
-                {skills.map((skill) => <b key={skill}>{skill}</b>)}
-              </div>
+              <h3>{item.school}</h3>
+              <strong>
+                {item.detail}
+                {item.period ? ` · ${item.period}` : ""}
+              </strong>
             </div>
           </article>
         ))}
