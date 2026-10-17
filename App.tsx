@@ -573,6 +573,119 @@ function GalleryPanel({ ownerPassword, isOwner }: GalleryPanelProps) {
   );
 }
 
+type VisitLogEntry = { at: string; device: string; isNew: boolean };
+
+function VisitorCounter({
+  ownerPassword,
+  isOwner,
+}: {
+  ownerPassword: string | null;
+  isOwner: boolean;
+}) {
+  const [stats, setStats] = useState<{ total: number; unique: number } | null>(null);
+  const [log, setLog] = useState<VisitLogEntry[]>([]);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const headers = {
+      Authorization: `Bearer ${publicAnonKey}`,
+      "Content-Type": "application/json",
+    };
+
+    const run = async () => {
+      try {
+        // Count one visit per browser session, and never count the owner
+        if (!ownerPassword && !sessionStorage.getItem("profile-visit-counted")) {
+          let visitorId = "";
+          try {
+            visitorId = localStorage.getItem("profile-visitor-id") ?? crypto.randomUUID();
+            localStorage.setItem("profile-visitor-id", visitorId);
+          } catch {
+            // Storage unavailable; the visit is still counted.
+          }
+
+          const response = await fetch(`${galleryApi}/visit`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({ visitorId }),
+          });
+          if (!response.ok) throw new Error("Visit not recorded.");
+          sessionStorage.setItem("profile-visit-counted", "1");
+          setStats(await response.json());
+        } else {
+          const response = await fetch(`${galleryApi}/visits`, { headers });
+          if (!response.ok) throw new Error("Unable to load visits.");
+          setStats(await response.json());
+        }
+      } catch {
+        // The counter is optional; hide it if the backend is unavailable.
+      }
+    };
+
+    run();
+  }, [ownerPassword]);
+
+  useEffect(() => {
+    if (!isOwner || !ownerPassword || !open) return;
+    fetch(`${galleryApi}/visits/log`, {
+      headers: {
+        Authorization: `Bearer ${publicAnonKey}`,
+        "X-Owner-Password": ownerPassword,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => setLog(data.log ?? []))
+      .catch(() => setLog([]));
+  }, [isOwner, ownerPassword, open]);
+
+  if (!stats) return null;
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: ".6rem",
+        margin: "1.2rem 0",
+        fontSize: ".85rem",
+      }}
+    >
+      <span className="rank-badge">
+        👀 {stats.total.toLocaleString()} VISITS · {stats.unique.toLocaleString()} UNIQUE
+      </span>
+      {isOwner && (
+        <>
+          <button type="button" className="owner-access" onClick={() => setOpen(!open)}>
+            {open ? "Hide recent visits" : "Recent visits"}
+          </button>
+          {open && (
+            <ul
+              style={{
+                listStyle: "none",
+                padding: 0,
+                margin: 0,
+                maxHeight: "12rem",
+                overflowY: "auto",
+                textAlign: "center",
+                opacity: 0.9,
+              }}
+            >
+              {log.length === 0 && <li>No visits logged yet.</li>}
+              {log.map((visit, index) => (
+                <li key={index} style={{ padding: ".25rem 0" }}>
+                  {new Date(visit.at).toLocaleString()} · {visit.device}
+                  {visit.isNew ? " · new visitor" : ""}
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function App() {
   const shellRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState("Overview");
@@ -865,6 +978,8 @@ export default function App() {
             {activeTab === "About" && <AboutPanel />}
           </div>
         </article>
+
+        <VisitorCounter ownerPassword={ownerPassword} isOwner={isOwner} />
 
         <footer>
           <span>Ria Ellaine · Public Profile</span>
