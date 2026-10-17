@@ -25,40 +25,52 @@ const cacheImage = (key: string, value: string) => {
 
 const projects = [
   {
-    name: "PRJ - ThriftLoop",
-    detail: "Curated Online Thrift Shop . 2026",
+    name: "ThriftLoop",
+    detail: "Curated online thrift shop",
+    period: "2026",
   },
   {
-    name: "PRJ - CLINIQ",
-    detail: "Online Clinic Booking System . 2026",
+    name: "CLINIQ",
+    detail: "Online clinic booking system",
+    period: "2026",
+  },
+];
+
+const organizations = [
+  {
+    name: "NUD Symphony",
+    detail: "Executive Secretary",
+    period: "2026",
   },
   {
-    name: "Org -NUD Student Government",
-    detail: " AudioVisual Member. 2025",
+    name: "NUD Symphony",
+    detail: "Secretariat Committee",
+    period: "2025 – 2026",
   },
   {
-    name: "Org - NUD Symphony",
-    detail: "Executive Secretary. 2026",
+    name: "NUD Sigma Esports",
+    detail: "OSEC – Records & Archives",
+    period: "2026",
   },
   {
-    name: "Org - NUD Symphony",
-    detail: "Secretariant Committee. 2025 - 2026",
+    name: "NUD Sigma Esports",
+    detail: "Event Committee",
+    period: "2025 – 2026",
   },
   {
-    name: "Org - NUD Sigma Esports",
-    detail: " OSEC - Records & Archives. 2026",
-  },
-   {
-    name: "Org - NUD Sigma Esports",
-    detail: " Event Committee. 2025 - 2026",
-  },
-   {
-    name: "Org - NUD Sigma Esports",
-    detail: " Logistics Committee. 2024 - 2025",
+    name: "NUD Sigma Esports",
+    detail: "Logistics Committee",
+    period: "2024 – 2025",
   },
   {
-    name: "Org - NUD Comsoc",
-    detail: " AudioVisual Coordinator. 2024 - 2025",
+    name: "NUD Student Government",
+    detail: "Audiovisual Member",
+    period: "2025",
+  },
+  {
+    name: "NUD COMSOC",
+    detail: "Audiovisual Coordinator",
+    period: "2024 – 2025",
   },
 ];
 
@@ -382,23 +394,36 @@ function AboutPanel() {
 }
 
 function PortfolioPanel() {
+  const renderItems = (items: typeof projects) =>
+    items.map((item) => (
+      <article className="timeline-item" key={`${item.name}-${item.detail}`}>
+        <span className="timeline-date">{item.period}</span>
+        <div>
+          <h3>{item.name}</h3>
+          <strong>{item.detail}</strong>
+        </div>
+      </article>
+    ));
+
   return (
     <section className="content-panel">
       <div className="panel-heading">
-        <div><span className="overline">Side Quest</span><h2>Things I did from the past</h2></div>
-        <span className="rank-badge">Past Projects?Org histories?</span>
+        <div>
+          <span className="overline">Side Quest</span>
+          <h2>Projects &amp; Involvements</h2>
+        </div>
+        <span className="rank-badge">
+          {projects.length} PROJECTS · {organizations.length} ROLES
+        </span>
       </div>
-      <div className="timeline">
-        {projects.map((item, index) => (
-          <article className="timeline-item" key={item.name}>
-            <span className="timeline-date">PROJECT {String(index + 1).padStart(2, "0")}</span>
-            <div>
-              <h3>{item.name}</h3>
-              <strong>{item.detail}</strong>
-            </div>
-          </article>
-        ))}
-      </div>
+
+      <span className="overline">Projects</span>
+      <div className="timeline">{renderItems(projects)}</div>
+
+      <span className="overline" style={{ display: "block", marginTop: "1.5rem" }}>
+        Organizations
+      </span>
+      <div className="timeline">{renderItems(organizations)}</div>
     </section>
   );
 }
