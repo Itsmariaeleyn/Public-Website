@@ -318,7 +318,7 @@ function OverviewPanel() {
           <span className="overline">Current status</span>
           <strong>Exploring and balancing everything</strong>
         </div>
-        <span className="rank-badge">AVAILABLE 2026</span>
+        <span className="rank-badge">@2026</span>
       </div>
     </section>
   );
