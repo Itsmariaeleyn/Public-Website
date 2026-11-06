@@ -1,27 +1,33 @@
-import { useEffect, useRef, useState, type FormEvent, type PointerEvent } from "react";
-import { projectId, publicAnonKey } from "./utils/supabase/info";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type PointerEvent,
+} from "react"
+import { projectId, publicAnonKey } from "../utils/supabase/info"
 
-const galleryApi = `https://${projectId}.supabase.co/functions/v1/make-server-424cfffc`;
+const galleryApi = `https://${projectId}.supabase.co/functions/v1/make-server-424cfffc`
 
-const PROFILE_IMAGE = "";
+const PROFILE_IMAGE = ""
 const COVER_IMAGE =
-  "https://images.unsplash.com/photo-1777731476530-bd4e64645d16?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=600&q=85&w=1400";
+  "https://images.unsplash.com/photo-1777731476530-bd4e64645d16?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&h=600&q=85&w=1400"
 
 const getCachedImage = (key: string, fallback: string) => {
   try {
-    return localStorage.getItem(key) || fallback;
+    return localStorage.getItem(key) || fallback
   } catch {
-    return fallback;
+    return fallback
   }
-};
+}
 
 const cacheImage = (key: string, value: string) => {
   try {
-    localStorage.setItem(key, value);
+    localStorage.setItem(key, value)
   } catch {
     // The cloud image still works when browser storage is unavailable.
   }
-};
+}
 
 const projects = [
   {
@@ -34,7 +40,7 @@ const projects = [
     detail: "Online clinic booking system",
     period: "2026",
   },
-];
+]
 
 const organizations = [
   {
@@ -72,23 +78,23 @@ const organizations = [
     detail: "Audiovisual Coordinator",
     period: "2024 – 2025",
   },
-];
+]
 
 type GalleryPhoto = {
-  id?: string;
-  src: string;
-  alt: string;
-  caption: string;
-};
+  id?: string
+  src: string
+  alt: string
+  caption: string
+}
 
 type ImageCropModalProps = {
-  file: File;
-  aspectRatio: number;
-  title: string;
-  allowFit?: boolean;
-  onCancel: () => void;
-  onConfirm: (file: File) => void;
-};
+  file: File
+  aspectRatio: number
+  title: string
+  allowFit?: boolean
+  onCancel: () => void
+  onConfirm: (file: File) => void
+}
 
 function ImageCropModal({
   file,
@@ -98,76 +104,94 @@ function ImageCropModal({
   onCancel,
   onConfirm,
 }: ImageCropModalProps) {
-  const [previewUrl, setPreviewUrl] = useState("");
-  const [positionX, setPositionX] = useState(50);
-  const [positionY, setPositionY] = useState(50);
-  const [zoom, setZoom] = useState(1);
-  const [frameMode, setFrameMode] = useState<"fill" | "fit">("fill");
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState("")
+  const [positionX, setPositionX] = useState(50)
+  const [positionY, setPositionY] = useState(50)
+  const [zoom, setZoom] = useState(1)
+  const [frameMode, setFrameMode] = useState<"fill" | "fit">("fill")
+  const [isProcessing, setIsProcessing] = useState(false)
 
   useEffect(() => {
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
-    return () => URL.revokeObjectURL(url);
-  }, [file]);
+    const url = URL.createObjectURL(file)
+    setPreviewUrl(url)
+    return () => URL.revokeObjectURL(url)
+  }, [file])
 
   const createCrop = async () => {
-    setIsProcessing(true);
+    setIsProcessing(true)
     try {
-      const image = new Image();
-      image.src = previewUrl;
-      await image.decode();
+      const image = new Image()
+      image.src = previewUrl
+      await image.decode()
 
-      const width = aspectRatio === 1 ? 900 : 1600;
-      const height = Math.round(width / aspectRatio);
-      const canvas = document.createElement("canvas");
-      canvas.width = width;
-      canvas.height = height;
-      const context = canvas.getContext("2d");
-      if (!context) throw new Error("Image preview is unavailable.");
+      const width = aspectRatio === 1 ? 900 : 1600
+      const height = Math.round(width / aspectRatio)
+      const canvas = document.createElement("canvas")
+      canvas.width = width
+      canvas.height = height
+      const context = canvas.getContext("2d")
+      if (!context) throw new Error("Image preview is unavailable.")
 
-      const baseScale = frameMode === "fit"
-        ? Math.min(width / image.naturalWidth, height / image.naturalHeight)
-        : Math.max(width / image.naturalWidth, height / image.naturalHeight);
-      const scale = baseScale * zoom;
-      const scaledWidth = image.naturalWidth * scale;
-      const scaledHeight = image.naturalHeight * scale;
-      const offsetX = -(scaledWidth - width) * (positionX / 100);
-      const offsetY = -(scaledHeight - height) * (positionY / 100);
-      context.fillStyle = "#2b456b";
-      context.fillRect(0, 0, width, height);
-      context.drawImage(image, offsetX, offsetY, scaledWidth, scaledHeight);
+      const baseScale =
+        frameMode === "fit"
+          ? Math.min(width / image.naturalWidth, height / image.naturalHeight)
+          : Math.max(width / image.naturalWidth, height / image.naturalHeight)
+      const scale = baseScale * zoom
+      const scaledWidth = image.naturalWidth * scale
+      const scaledHeight = image.naturalHeight * scale
+      const offsetX = -(scaledWidth - width) * (positionX / 100)
+      const offsetY = -(scaledHeight - height) * (positionY / 100)
+      context.fillStyle = "#2b456b"
+      context.fillRect(0, 0, width, height)
+      context.drawImage(image, offsetX, offsetY, scaledWidth, scaledHeight)
 
       const blob = await new Promise<Blob>((resolve, reject) => {
         canvas.toBlob(
-          (result) => result ? resolve(result) : reject(new Error("Unable to crop image.")),
+          (result) =>
+            result
+              ? resolve(result)
+              : reject(new Error("Unable to crop image.")),
           "image/jpeg",
-          .9,
-        );
-      });
-      onConfirm(new File([blob], `${file.name.replace(/\.[^.]+$/, "")}-cropped.jpg`, {
-        type: "image/jpeg",
-      }));
+          0.9,
+        )
+      })
+      onConfirm(
+        new File([blob], `${file.name.replace(/\.[^.]+$/, "")}-cropped.jpg`, {
+          type: "image/jpeg",
+        }),
+      )
     } finally {
-      setIsProcessing(false);
+      setIsProcessing(false)
     }
-  };
+  }
 
   return (
     <div className="crop-modal-backdrop">
-      <section className="crop-modal" role="dialog" aria-modal="true" aria-labelledby="crop-title">
+      <section
+        className="crop-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="crop-title"
+      >
         <div className="crop-heading">
           <div>
             <span className="overline">Image preview</span>
             <h2 id="crop-title">{title}</h2>
           </div>
-          <button type="button" onClick={onCancel} aria-label="Close image preview">×</button>
+          <button
+            type="button"
+            onClick={onCancel}
+            aria-label="Close image preview"
+          >
+            ×
+          </button>
         </div>
         <div
           className="crop-preview"
           style={{
             aspectRatio,
-            maxWidth: aspectRatio === 1 ? "24rem" : aspectRatio < 2 ? "32rem" : "100%",
+            maxWidth:
+              aspectRatio === 1 ? "24rem" : aspectRatio < 2 ? "32rem" : "100%",
           }}
         >
           {previewUrl && (
@@ -189,8 +213,8 @@ function ImageCropModal({
               className={frameMode === "fill" ? "active" : ""}
               type="button"
               onClick={() => {
-                setFrameMode("fill");
-                setZoom(1);
+                setFrameMode("fill")
+                setZoom(1)
               }}
             >
               Fill frame
@@ -199,8 +223,8 @@ function ImageCropModal({
               className={frameMode === "fit" ? "active" : ""}
               type="button"
               onClick={() => {
-                setFrameMode("fit");
-                setZoom(1);
+                setFrameMode("fit")
+                setZoom(1)
               }}
             >
               Fit to frame
@@ -241,49 +265,45 @@ function ImageCropModal({
           </label>
         </div>
         <div className="crop-actions">
-          <button type="button" className="crop-cancel" onClick={onCancel}>Cancel</button>
+          <button type="button" className="crop-cancel" onClick={onCancel}>
+            Cancel
+          </button>
           <button type="button" onClick={createCrop} disabled={isProcessing}>
             {isProcessing ? "Preparing..." : "Use this crop"}
           </button>
         </div>
       </section>
     </div>
-  );
+  )
 }
 
-const tabs = ["Overview", "Gaming", "Experience", "Gallery", "About"];
-
-const StarIcon = () => (
-  <svg aria-hidden="true" viewBox="0 0 24 24">
-    <path d="m12 2.8 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 2.8Z" />
-  </svg>
-);
+const tabs = ["Overview", "Gaming", "Experience", "Gallery", "About"]
 
 const SunIcon = () => (
   <svg aria-hidden="true" viewBox="0 0 24 24">
     <circle cx="12" cy="12" r="4" />
     <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
   </svg>
-);
+)
 
 const MoonIcon = () => (
   <svg aria-hidden="true" viewBox="0 0 24 24">
     <path d="M20 15.2A8.5 8.5 0 0 1 8.8 4a8.5 8.5 0 1 0 11.2 11.2Z" />
   </svg>
-);
+)
 
 const AcademicIcon = () => (
   <svg aria-hidden="true" viewBox="0 0 24 24">
     <path d="m3 8.5 9-4 9 4-9 4-9-4Z" />
     <path d="M6.5 10.2v5.1c2.9 2.3 8.1 2.3 11 0v-5.1M21 9v6" />
   </svg>
-);
+)
 
 const CivicIcon = () => (
   <svg aria-hidden="true" viewBox="0 0 24 24">
     <path d="M4 20h16M5.5 17h13M7 17V9m5 8V9m5 8V9M4 7h16L12 3 4 7Z" />
   </svg>
-);
+)
 
 function OverviewPanel() {
   return (
@@ -293,18 +313,23 @@ function OverviewPanel() {
           <span className="overline">Public Profile</span>
           <h2>Welcome to my space</h2>
         </div>
-        <span className="online-pill"><i /> Reach me freely with purpose</span>
+        <span className="online-pill">
+          <i /> Reach me freely with purpose
+        </span>
       </div>
       <p className="profile-summary">
-        Hey there! I&apos;m Ria — current 3rd year IT Student at NU Dasma. I play to compete,
-        connect, and have fun, while building and exploring digital experiences that make communities more useful,
-        welcoming, and fun.
+        Hey there! I&apos;m Ria — current 3rd year IT Student at NU Dasma. I
+        play to compete, connect, and have fun, while building and exploring
+        digital experiences that make communities more useful, welcoming, and
+        fun.
       </p>
       <div className="cv-columns">
         <div>
           <span className="overline">Find me online</span>
           <a href="#profile">@mariangeleyn_ · Discord</a>
-          <a href="mailto:maellainebejerano@gmail.com">maellainebejerano@gmail.com</a>
+          <a href="mailto:maellainebejerano@gmail.com">
+            maellainebejerano@gmail.com
+          </a>
         </div>
         <div>
           <span className="overline">Profile details</span>
@@ -321,7 +346,7 @@ function OverviewPanel() {
         <span className="rank-badge">@2026</span>
       </div>
     </section>
-  );
+  )
 }
 
 function GamingPanel() {
@@ -338,13 +363,18 @@ function GamingPanel() {
       company: "Pang alis umay",
       details: "Makipag away sa bata LOL",
     },
-  ];
+  ]
 
   return (
     <section className="content-panel">
       <div className="panel-heading">
-        <div><span className="overline">Games & play style</span><h2>Gaming profile</h2></div>
-        <span className="panel-icon"><CivicIcon /></span>
+        <div>
+          <span className="overline">Games & play style</span>
+          <h2>Gaming profile</h2>
+        </div>
+        <span className="panel-icon">
+          <CivicIcon />
+        </span>
       </div>
       <div className="timeline">
         {roles.map((item) => (
@@ -359,7 +389,7 @@ function GamingPanel() {
         ))}
       </div>
     </section>
-  );
+  )
 }
 
 const education = [
@@ -381,21 +411,29 @@ const education = [
     detail: "Information Technology · 3rd Year",
     period: "Present",
   },
-];
+]
 
 function AboutPanel() {
-  const visibleEducation = education.filter((item) => item.school);
+  const visibleEducation = education.filter((item) => item.school)
 
   return (
     <section className="content-panel">
       <div className="panel-heading">
-        <div><span className="overline">The person behind the tag</span><h2>About me</h2></div>
-        <span className="panel-icon"><AcademicIcon /></span>
+        <div>
+          <span className="overline">The person behind the tag</span>
+          <h2>About me</h2>
+        </div>
+        <span className="panel-icon">
+          <AcademicIcon />
+        </span>
       </div>
       <span className="overline">Education</span>
       <div className="timeline">
         {[...visibleEducation].reverse().map((item) => (
-          <article className="timeline-item" key={`${item.level}-${item.detail}`}>
+          <article
+            className="timeline-item"
+            key={`${item.level}-${item.detail}`}
+          >
             <span className="timeline-date">{item.level.toUpperCase()}</span>
             <div>
               <h3>{item.school}</h3>
@@ -408,7 +446,7 @@ function AboutPanel() {
         ))}
       </div>
     </section>
-  );
+  )
 }
 
 function PortfolioPanel() {
@@ -421,7 +459,7 @@ function PortfolioPanel() {
           <strong>{item.detail}</strong>
         </div>
       </article>
-    ));
+    ))
 
   return (
     <section className="content-panel">
@@ -438,27 +476,31 @@ function PortfolioPanel() {
       <span className="overline">Projects Built</span>
       <div className="timeline">{renderItems(projects)}</div>
 
-      <span className="overline" style={{ display: "block", marginTop: "1.5rem" }}>
+      <span
+        className="overline"
+        style={{ display: "block", marginTop: "1.5rem" }}
+      >
         Organizations &amp; Roles
       </span>
       <div className="timeline">{renderItems(organizations)}</div>
     </section>
-  );
+  )
 }
 
 type GalleryPanelProps = {
-  ownerPassword: string | null;
-  isOwner: boolean;
-};
+  ownerPassword: string | null
+  isOwner: boolean
+}
 
 function GalleryPanel({ ownerPassword, isOwner }: GalleryPanelProps) {
-  const [uploadedPhotos, setUploadedPhotos] = useState<GalleryPhoto[]>([]);
-  const [caption, setCaption] = useState("");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [cropCandidate, setCropCandidate] = useState<File | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isUploading, setIsUploading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [uploadedPhotos, setUploadedPhotos] = useState<GalleryPhoto[]>([])
+  const [previewPhoto, setPreviewPhoto] = useState<GalleryPhoto | null>(null)
+  const [caption, setCaption] = useState("")
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [cropCandidate, setCropCandidate] = useState<File | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isUploading, setIsUploading] = useState(false)
+  const [message, setMessage] = useState("")
 
   useEffect(() => {
     const loadGallery = async () => {
@@ -467,30 +509,46 @@ function GalleryPanel({ ownerPassword, isOwner }: GalleryPanelProps) {
           headers: {
             Authorization: `Bearer ${publicAnonKey}`,
           },
-        });
-        if (!response.ok) throw new Error("Unable to load gallery.");
-        const data = await response.json();
-        setUploadedPhotos(data.photos ?? []);
+        })
+        if (!response.ok) throw new Error("Unable to load gallery.")
+        const data = await response.json()
+        setUploadedPhotos(data.photos ?? [])
       } catch {
-        setMessage("Cloud photos are temporarily unavailable.");
+        setMessage("Cloud photos are temporarily unavailable.")
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
-    loadGallery();
-  }, []);
+    loadGallery()
+  }, [])
+
+  useEffect(() => {
+    if (!previewPhoto) return
+
+    const closePreview = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setPreviewPhoto(null)
+    }
+
+    document.body.style.overflow = "hidden"
+    window.addEventListener("keydown", closePreview)
+
+    return () => {
+      document.body.style.overflow = ""
+      window.removeEventListener("keydown", closePreview)
+    }
+  }, [previewPhoto])
 
   const uploadPhoto = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!selectedFile || !ownerPassword) return;
+    event.preventDefault()
+    if (!selectedFile || !ownerPassword) return
 
-    const form = event.currentTarget;
-    setIsUploading(true);
-    setMessage("Uploading photo...");
-    const formData = new FormData();
-    formData.append("photo", selectedFile);
-    formData.append("caption", caption);
+    const form = event.currentTarget
+    setIsUploading(true)
+    setMessage("Uploading photo...")
+    const formData = new FormData()
+    formData.append("photo", selectedFile)
+    formData.append("caption", caption)
 
     try {
       const response = await fetch(`${galleryApi}/gallery/upload`, {
@@ -500,24 +558,29 @@ function GalleryPanel({ ownerPassword, isOwner }: GalleryPanelProps) {
           "X-Owner-Password": ownerPassword,
         },
         body: formData,
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error ?? "Upload failed.");
+      })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error ?? "Upload failed.")
 
-      setUploadedPhotos((current) => [data.photo, ...current]);
-      setSelectedFile(null);
-      setCaption("");
-      setMessage("Photo uploaded. It is now visible to everyone.");
-      form.reset();
+      setUploadedPhotos((current) => [data.photo, ...current])
+      setSelectedFile(null)
+      setCaption("")
+      setMessage("Photo uploaded. It is now visible to everyone.")
+      form.reset()
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Upload failed.");
+      setMessage(error instanceof Error ? error.message : "Upload failed.")
     } finally {
-      setIsUploading(false);
+      setIsUploading(false)
     }
-  };
+  }
 
   const removePhoto = async (photo: GalleryPhoto) => {
-    if (!photo.id || !ownerPassword || !window.confirm("Remove this photo from the gallery?")) return;
+    if (
+      !photo.id ||
+      !ownerPassword ||
+      !window.confirm("Remove this photo from the gallery?")
+    )
+      return
 
     const response = await fetch(`${galleryApi}/gallery/${photo.id}`, {
       method: "DELETE",
@@ -525,15 +588,17 @@ function GalleryPanel({ ownerPassword, isOwner }: GalleryPanelProps) {
         Authorization: `Bearer ${publicAnonKey}`,
         "X-Owner-Password": ownerPassword,
       },
-    });
+    })
     if (response.ok) {
-      setUploadedPhotos((current) => current.filter((item) => item.id !== photo.id));
-      setMessage("Photo removed.");
+      setUploadedPhotos((current) =>
+        current.filter((item) => item.id !== photo.id),
+      )
+      setMessage("Photo removed.")
     } else {
-      const data = await response.json();
-      setMessage(data.error ?? "The photo could not be removed.");
+      const data = await response.json()
+      setMessage(data.error ?? "The photo could not be removed.")
     }
-  };
+  }
 
   return (
     <section className="content-panel">
@@ -542,10 +607,13 @@ function GalleryPanel({ ownerPassword, isOwner }: GalleryPanelProps) {
           <span className="overline">Moments & memories</span>
           <h2>Mini gallery</h2>
         </div>
-        <span className="rank-badge">{uploadedPhotos.length.toString().padStart(2, "0")} PHOTOS</span>
+        <span className="rank-badge">
+          {uploadedPhotos.length.toString().padStart(2, "0")} PHOTOS
+        </span>
       </div>
       <p className="gallery-intro">
-        A few snapshots from games, community events, projects, and everything in between.
+        A few snapshots from games, community events, projects, and everything
+        in between.
       </p>
       {ownerPassword && isOwner && (
         <details className="gallery-admin">
@@ -557,8 +625,8 @@ function GalleryPanel({ ownerPassword, isOwner }: GalleryPanelProps) {
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 onChange={(event) => {
-                  setCropCandidate(event.target.files?.[0] ?? null);
-                  event.target.value = "";
+                  setCropCandidate(event.target.files?.[0] ?? null)
+                  event.target.value = ""
                 }}
               />
             </label>
@@ -573,10 +641,18 @@ function GalleryPanel({ ownerPassword, isOwner }: GalleryPanelProps) {
               {isUploading ? "Uploading..." : "Upload photo"}
             </button>
           </form>
-          {message && <p className="gallery-message" role="status">{message}</p>}
+          {message && (
+            <p className="gallery-message" role="status">
+              {message}
+            </p>
+          )}
         </details>
       )}
-      {!isOwner && message && <p className="gallery-loading" role="status">{message}</p>}
+      {!isOwner && message && (
+        <p className="gallery-loading" role="status">
+          {message}
+        </p>
+      )}
       {isLoading && <p className="gallery-loading">Loading shared photos...</p>}
       {!isLoading && uploadedPhotos.length === 0 && (
         <p className="gallery-empty">No moments added yet. Check back soon.</p>
@@ -584,8 +660,15 @@ function GalleryPanel({ ownerPassword, isOwner }: GalleryPanelProps) {
       <div className="gallery-grid">
         {uploadedPhotos.map((photo) => (
           <figure key={photo.id ?? photo.src}>
-            <img src={photo.src} alt={photo.alt} loading="lazy" />
-            <figcaption>{photo.caption}</figcaption>
+            <button
+              className="gallery-preview-trigger"
+              type="button"
+              onClick={() => setPreviewPhoto(photo)}
+              aria-label={`Preview ${photo.caption || photo.alt}`}
+            >
+              <img src={photo.src} alt={photo.alt} loading="lazy" />
+              <span>{photo.caption}</span>
+            </button>
             {isOwner && photo.id && (
               <button
                 className="gallery-remove"
@@ -599,6 +682,32 @@ function GalleryPanel({ ownerPassword, isOwner }: GalleryPanelProps) {
           </figure>
         ))}
       </div>
+      {previewPhoto && (
+        <div
+          className="gallery-lightbox"
+          role="presentation"
+          onClick={() => setPreviewPhoto(null)}
+        >
+          <section
+            className="gallery-lightbox-content"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Photo preview: ${previewPhoto.caption || previewPhoto.alt}`}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              className="gallery-lightbox-close"
+              type="button"
+              onClick={() => setPreviewPhoto(null)}
+              aria-label="Close photo preview"
+            >
+              ×
+            </button>
+            <img src={previewPhoto.src} alt={previewPhoto.alt} />
+            {previewPhoto.caption && <p>{previewPhoto.caption}</p>}
+          </section>
+        </div>
+      )}
       {cropCandidate && (
         <ImageCropModal
           file={cropCandidate}
@@ -607,42 +716,51 @@ function GalleryPanel({ ownerPassword, isOwner }: GalleryPanelProps) {
           allowFit
           onCancel={() => setCropCandidate(null)}
           onConfirm={(file) => {
-            setSelectedFile(file);
-            setCropCandidate(null);
+            setSelectedFile(file)
+            setCropCandidate(null)
           }}
         />
       )}
     </section>
-  );
+  )
 }
 
-type VisitLogEntry = { at: string; device: string; isNew: boolean };
+type VisitLogEntry = {
+  at: string
+  device: string
+  isNew: boolean
+}
 
 function VisitorCounter({
   ownerPassword,
   isOwner,
 }: {
-  ownerPassword: string | null;
-  isOwner: boolean;
+  ownerPassword: string | null
+  isOwner: boolean
 }) {
-  const [stats, setStats] = useState<{ total: number; unique: number } | null>(null);
-  const [log, setLog] = useState<VisitLogEntry[]>([]);
-  const [open, setOpen] = useState(false);
+  const [stats, setStats] = useState<{ total: number unique: number } | null>(
+    null,
+  )
+  const [log, setLog] = useState<VisitLogEntry[]>([])
+  const [open, setOpen] = useState(false)
 
   useEffect(() => {
     const headers = {
       Authorization: `Bearer ${publicAnonKey}`,
       "Content-Type": "application/json",
-    };
+    }
 
     const run = async () => {
       try {
-        // Count one visit per browser session, and never count the owner
-        if (!ownerPassword && !sessionStorage.getItem("profile-visit-counted")) {
-          let visitorId = "";
+        if (
+          !ownerPassword &&
+          !sessionStorage.getItem("profile-visit-counted")
+        ) {
+          let visitorId = ""
           try {
-            visitorId = localStorage.getItem("profile-visitor-id") ?? crypto.randomUUID();
-            localStorage.setItem("profile-visitor-id", visitorId);
+            visitorId =
+              localStorage.getItem("profile-visitor-id") ?? crypto.randomUUID()
+            localStorage.setItem("profile-visitor-id", visitorId)
           } catch {
             // Storage unavailable; the visit is still counted.
           }
@@ -651,25 +769,26 @@ function VisitorCounter({
             method: "POST",
             headers,
             body: JSON.stringify({ visitorId }),
-          });
-          if (!response.ok) throw new Error("Visit not recorded.");
-          sessionStorage.setItem("profile-visit-counted", "1");
-          setStats(await response.json());
+          })
+          if (!response.ok) throw new Error("Visit not recorded.")
+          sessionStorage.setItem("profile-visit-counted", "1")
+          setStats(await response.json())
         } else {
-          const response = await fetch(`${galleryApi}/visits`, { headers });
-          if (!response.ok) throw new Error("Unable to load visits.");
-          setStats(await response.json());
+          const response = await fetch(`${galleryApi}/visits`, { headers })
+          if (!response.ok) throw new Error("Unable to load visits.")
+          setStats(await response.json())
         }
       } catch {
         // The counter is optional; hide it if the backend is unavailable.
       }
-    };
+    }
 
-    run();
-  }, [ownerPassword]);
+    run()
+  }, [ownerPassword])
 
   useEffect(() => {
-    if (!isOwner || !ownerPassword || !open) return;
+    if (!isOwner || !ownerPassword || !open) return
+
     fetch(`${galleryApi}/visits/log`, {
       headers: {
         Authorization: `Bearer ${publicAnonKey}`,
@@ -678,45 +797,32 @@ function VisitorCounter({
     })
       .then((response) => response.json())
       .then((data) => setLog(data.log ?? []))
-      .catch(() => setLog([]));
-  }, [isOwner, ownerPassword, open]);
+      .catch(() => setLog([]))
+  }, [isOwner, ownerPassword, open])
 
-  if (!stats) return null;
+  if (!stats) return null
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: ".6rem",
-        margin: "1.2rem 0",
-        fontSize: ".85rem",
-      }}
-    >
+    <section className="visitor-counter" aria-label="Profile visit statistics">
       <span className="rank-badge">
-        👀 {stats.total.toLocaleString()} VISITS · {stats.unique.toLocaleString()} UNIQUE
+        {stats.total.toLocaleString()} VISITS · {stats.unique.toLocaleString()}{" "}
+        UNIQUE
       </span>
       {isOwner && (
         <>
-          <button type="button" className="owner-access" onClick={() => setOpen(!open)}>
+          <button
+            type="button"
+            className="owner-access"
+            onClick={() => setOpen(!open)}
+            aria-expanded={open}
+          >
             {open ? "Hide recent visits" : "Recent visits"}
           </button>
           {open && (
-            <ul
-              style={{
-                listStyle: "none",
-                padding: 0,
-                margin: 0,
-                maxHeight: "12rem",
-                overflowY: "auto",
-                textAlign: "center",
-                opacity: 0.9,
-              }}
-            >
+            <ul className="visit-log">
               {log.length === 0 && <li>No visits logged yet.</li>}
               {log.map((visit, index) => (
-                <li key={index} style={{ padding: ".25rem 0" }}>
+                <li key={`${visit.at}-${index}`}>
                   {new Date(visit.at).toLocaleString()} · {visit.device}
                   {visit.isNew ? " · new visitor" : ""}
                 </li>
@@ -725,59 +831,64 @@ function VisitorCounter({
           )}
         </>
       )}
-    </div>
-  );
+    </section>
+  )
 }
 
 export default function App() {
-  const shellRef = useRef<HTMLDivElement>(null);
-  const [activeTab, setActiveTab] = useState("Overview");
+  const shellRef = useRef<HTMLDivElement>(null)
+  const [activeTab, setActiveTab] = useState("Overview")
   const [ownerPassword, setOwnerPassword] = useState<string | null>(() => {
-    return sessionStorage.getItem("profile-owner-password");
-  });
-  const [passwordInput, setPasswordInput] = useState("");
-  const [isOwner, setIsOwner] = useState(false);
+    return sessionStorage.getItem("profile-owner-password")
+  })
+  const [passwordInput, setPasswordInput] = useState("")
+  const [isOwner, setIsOwner] = useState(false)
   const [avatarImage, setAvatarImage] = useState(() =>
-    getCachedImage("profile-avatar-url", PROFILE_IMAGE)
-  );
-  const [profileMediaLoading, setProfileMediaLoading] = useState(true);
-  const [avatarStatus, setAvatarStatus] = useState("");
-  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
-  const [showOwnerLogin, setShowOwnerLogin] = useState(false);
-  const [mediaCrop, setMediaCrop] = useState<{ file: File; kind: "avatar" | "cover" } | null>(null);
+    getCachedImage("profile-avatar-url", PROFILE_IMAGE),
+  )
+  const [profileMediaLoading, setProfileMediaLoading] = useState(true)
+  const [avatarStatus, setAvatarStatus] = useState("")
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
+  const [showOwnerLogin, setShowOwnerLogin] = useState(false)
+  const [mediaCrop, setMediaCrop] = useState<{
+    file: File
+    kind: "avatar" | "cover"
+  } | null>(null)
   const [coverImage, setCoverImage] = useState(() =>
-    getCachedImage("profile-cover-url", COVER_IMAGE)
-  );
-  const [coverStatus, setCoverStatus] = useState("");
-  const [isUploadingCover, setIsUploadingCover] = useState(false);
+    getCachedImage("profile-cover-url", COVER_IMAGE),
+  )
+  const [coverStatus, setCoverStatus] = useState("")
+  const [isUploadingCover, setIsUploadingCover] = useState(false)
   const [theme, setTheme] = useState<"dark" | "light">(() => {
-    const savedTheme = localStorage.getItem("profile-theme");
-    if (savedTheme === "dark" || savedTheme === "light") return savedTheme;
-    return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
-  });
+    const savedTheme = localStorage.getItem("profile-theme")
+    if (savedTheme === "dark" || savedTheme === "light") return savedTheme
+    return window.matchMedia("(prefers-color-scheme: light)").matches
+      ? "light"
+      : "dark"
+  })
 
   useEffect(() => {
-    localStorage.setItem("profile-theme", theme);
-    document.documentElement.style.colorScheme = theme;
-  }, [theme]);
+    localStorage.setItem("profile-theme", theme)
+    document.documentElement.style.colorScheme = theme
+  }, [theme])
 
   useEffect(() => {
-    let isActive = true;
+    let isActive = true
 
     const verifySavedPassword = async () => {
-      if (!ownerPassword) return;
+      if (!ownerPassword) return
       try {
         const response = await fetch(`${galleryApi}/gallery/owner`, {
           headers: {
             Authorization: `Bearer ${publicAnonKey}`,
             "X-Owner-Password": ownerPassword,
           },
-        });
-        if (isActive) setIsOwner(response.ok);
+        })
+        if (isActive) setIsOwner(response.ok)
       } catch {
-        if (isActive) setIsOwner(false);
+        if (isActive) setIsOwner(false)
       }
-    };
+    }
 
     fetch(`${galleryApi}/profile-media`, {
       headers: {
@@ -786,71 +897,76 @@ export default function App() {
     })
       .then((response) => response.json())
       .then((data) => {
-        if (!isActive) return;
+        if (!isActive) return
         if (data.media?.avatarUrl) {
-          setAvatarImage(data.media.avatarUrl);
-          cacheImage("profile-avatar-url", data.media.avatarUrl);
+          setAvatarImage(data.media.avatarUrl)
+          cacheImage("profile-avatar-url", data.media.avatarUrl)
         }
         if (data.media?.coverUrl) {
-          setCoverImage(data.media.coverUrl);
-          cacheImage("profile-cover-url", data.media.coverUrl);
+          setCoverImage(data.media.coverUrl)
+          cacheImage("profile-cover-url", data.media.coverUrl)
         }
       })
       .catch(() => {
         // Keep the default cover when cloud media is unavailable.
       })
       .finally(() => {
-        if (isActive) setProfileMediaLoading(false);
-      });
+        if (isActive) setProfileMediaLoading(false)
+      })
 
-    verifySavedPassword();
+    verifySavedPassword()
 
     return () => {
-      isActive = false;
-    };
-  }, [ownerPassword]);
+      isActive = false
+    }
+  }, [ownerPassword])
 
   const unlockOwnerControls = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setAvatarStatus("Checking password...");
+    event.preventDefault()
+    setAvatarStatus("Checking password...")
     try {
       const response = await fetch(`${galleryApi}/gallery/owner`, {
         headers: {
           Authorization: `Bearer ${publicAnonKey}`,
           "X-Owner-Password": passwordInput,
         },
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error ?? "Incorrect owner password.");
+      })
+      const data = await response.json()
+      if (!response.ok)
+        throw new Error(data.error ?? "Incorrect owner password.")
 
-      const normalizedPassword = passwordInput.trim();
-      sessionStorage.setItem("profile-owner-password", normalizedPassword);
-      setOwnerPassword(normalizedPassword);
-      setIsOwner(true);
-      setPasswordInput("");
-      setAvatarStatus("");
-      setShowOwnerLogin(false);
+      const normalizedPassword = passwordInput.trim()
+      sessionStorage.setItem("profile-owner-password", normalizedPassword)
+      setOwnerPassword(normalizedPassword)
+      setIsOwner(true)
+      setPasswordInput("")
+      setAvatarStatus("")
+      setShowOwnerLogin(false)
     } catch (error) {
-      setAvatarStatus(error instanceof Error ? error.message : "Unable to unlock owner controls.");
+      setAvatarStatus(
+        error instanceof Error
+          ? error.message
+          : "Unable to unlock owner controls.",
+      )
     }
-  };
+  }
 
   const updateAvatar = async (file: File) => {
-    if (!ownerPassword || !isOwner) return;
+    if (!ownerPassword || !isOwner) return
 
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-      setAvatarStatus("Choose a JPG, PNG, or WebP image.");
-      return;
+      setAvatarStatus("Choose a JPG, PNG, or WebP image.")
+      return
     }
     if (file.size > 5 * 1024 * 1024) {
-      setAvatarStatus("Profile images must be 5 MB or smaller.");
-      return;
+      setAvatarStatus("Profile images must be 5 MB or smaller.")
+      return
     }
 
-    setIsUploadingAvatar(true);
-    setAvatarStatus("Uploading profile picture...");
-    const formData = new FormData();
-    formData.append("photo", file);
+    setIsUploadingAvatar(true)
+    setAvatarStatus("Uploading profile picture...")
+    const formData = new FormData()
+    formData.append("photo", file)
 
     try {
       const response = await fetch(`${galleryApi}/profile-media/avatar`, {
@@ -860,36 +976,38 @@ export default function App() {
           "X-Owner-Password": ownerPassword,
         },
         body: formData,
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error ?? "Profile update failed.");
+      })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error ?? "Profile update failed.")
 
-      setAvatarImage(data.media.avatarUrl);
-      cacheImage("profile-avatar-url", data.media.avatarUrl);
-      setAvatarStatus("Profile picture updated for all visitors.");
+      setAvatarImage(data.media.avatarUrl)
+      cacheImage("profile-avatar-url", data.media.avatarUrl)
+      setAvatarStatus("Profile picture updated for all visitors.")
     } catch (error) {
-      setAvatarStatus(error instanceof Error ? error.message : "Profile update failed.");
+      setAvatarStatus(
+        error instanceof Error ? error.message : "Profile update failed.",
+      )
     } finally {
-      setIsUploadingAvatar(false);
+      setIsUploadingAvatar(false)
     }
-  };
+  }
 
   const updateCover = async (file: File) => {
-    if (!ownerPassword || !isOwner) return;
+    if (!ownerPassword || !isOwner) return
 
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-      setCoverStatus("Choose a JPG, PNG, or WebP image.");
-      return;
+      setCoverStatus("Choose a JPG, PNG, or WebP image.")
+      return
     }
     if (file.size > 5 * 1024 * 1024) {
-      setCoverStatus("Cover images must be 5 MB or smaller.");
-      return;
+      setCoverStatus("Cover images must be 5 MB or smaller.")
+      return
     }
 
-    setIsUploadingCover(true);
-    setCoverStatus("Uploading cover...");
-    const formData = new FormData();
-    formData.append("photo", file);
+    setIsUploadingCover(true)
+    setCoverStatus("Uploading cover...")
+    const formData = new FormData()
+    formData.append("photo", file)
 
     try {
       const response = await fetch(`${galleryApi}/profile-media/cover`, {
@@ -899,25 +1017,27 @@ export default function App() {
           "X-Owner-Password": ownerPassword,
         },
         body: formData,
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error ?? "Cover update failed.");
+      })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error ?? "Cover update failed.")
 
-      setCoverImage(data.media.coverUrl);
-      cacheImage("profile-cover-url", data.media.coverUrl);
-      setCoverStatus("Cover updated for all visitors.");
+      setCoverImage(data.media.coverUrl)
+      cacheImage("profile-cover-url", data.media.coverUrl)
+      setCoverStatus("Cover updated for all visitors.")
     } catch (error) {
-      setCoverStatus(error instanceof Error ? error.message : "Cover update failed.");
+      setCoverStatus(
+        error instanceof Error ? error.message : "Cover update failed.",
+      )
     } finally {
-      setIsUploadingCover(false);
+      setIsUploadingCover(false)
     }
-  };
+  }
 
   const moveCursorGlow = (event: PointerEvent<HTMLDivElement>) => {
-    shellRef.current?.style.setProperty("--cursor-x", `${event.clientX}px`);
-    shellRef.current?.style.setProperty("--cursor-y", `${event.clientY}px`);
-    shellRef.current?.style.setProperty("--cursor-glow-opacity", "1");
-  };
+    shellRef.current?.style.setProperty("--cursor-x", `${event.clientX}px`)
+    shellRef.current?.style.setProperty("--cursor-y", `${event.clientY}px`)
+    shellRef.current?.style.setProperty("--cursor-glow-opacity", "1")
+  }
 
   return (
     <div
@@ -925,9 +1045,56 @@ export default function App() {
       data-theme={theme}
       ref={shellRef}
       onPointerMove={moveCursorGlow}
-      onPointerLeave={() => shellRef.current?.style.setProperty("--cursor-glow-opacity", "0")}
+      onPointerLeave={() =>
+        shellRef.current?.style.setProperty("--cursor-glow-opacity", "0")
+      }
     >
       <div className="cursor-glow" aria-hidden="true" />
+      <div className="ambient-art" aria-hidden="true">
+        <span className="orbit orbit-one">
+          <i />
+        </span>
+        <span className="orbit orbit-two">
+          <i />
+        </span>
+        <span className="spark spark-one" />
+        <span className="spark spark-two" />
+        <span className="spark spark-three" />
+        <span className="hud-lines hud-lines-left" />
+        <span className="hud-lines hud-lines-right" />
+        <span className="nebula-ribbon nebula-ribbon-left" />
+        <span className="nebula-ribbon nebula-ribbon-right" />
+        <span className="dot-matrix dot-matrix-left" />
+        <span className="dot-matrix dot-matrix-right" />
+        <span className="constellation constellation-one">
+          <i />
+          <i />
+          <i />
+          <i />
+        </span>
+        <span className="constellation constellation-two">
+          <i />
+          <i />
+          <i />
+        </span>
+        <span className="floating-symbol symbol-plus" />
+        <span className="floating-symbol symbol-diamond" />
+        <span className="floating-symbol symbol-ring" />
+        <span className="graphic-burst graphic-burst-left" />
+        <span className="graphic-burst graphic-burst-right" />
+        <span className="energy-streak energy-streak-one" />
+        <span className="energy-streak energy-streak-two" />
+        <span className="energy-streak energy-streak-three" />
+        <span className="tech-frame tech-frame-left">
+          <i />
+          <i />
+          <i />
+        </span>
+        <span className="tech-frame tech-frame-right">
+          <i />
+          <i />
+        </span>
+      </div>
       <button
         className="theme-toggle"
         type="button"
@@ -951,9 +1118,9 @@ export default function App() {
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
                     onChange={(event) => {
-                      const file = event.target.files?.[0];
-                      event.target.value = "";
-                      if (file) setMediaCrop({ file, kind: "cover" });
+                      const file = event.target.files?.[0]
+                      event.target.value = ""
+                      if (file) setMediaCrop({ file, kind: "cover" })
                     }}
                     disabled={isUploadingCover}
                   />
@@ -965,25 +1132,50 @@ export default function App() {
 
           <div className="identity">
             <div className="avatar-shell">
+              <div className="avatar-decoration" aria-hidden="true">
+                <span className="avatar-orbit">
+                  <i />
+                  <i />
+                  <i />
+                </span>
+                <span className="avatar-glint avatar-glint-left" />
+                <span className="avatar-glint avatar-glint-right" />
+              </div>
               {avatarImage ? (
-                <img className="avatar" src={avatarImage} alt="Portrait of Ria Ellaine" />
+                <img
+                  className="avatar"
+                  src={avatarImage}
+                  alt="Portrait of Ria Ellaine"
+                />
               ) : profileMediaLoading ? (
-                <div className="avatar avatar-loading" aria-label="Loading profile picture" />
+                <div
+                  className="avatar avatar-loading"
+                  aria-label="Loading profile picture"
+                />
               ) : (
-                <div className="avatar avatar-placeholder" aria-label="No profile picture uploaded">
+                <div
+                  className="avatar avatar-placeholder"
+                  aria-label="No profile picture uploaded"
+                >
                   R
                 </div>
               )}
               {isOwner && (
-                <label className={isUploadingAvatar ? "avatar-edit is-uploading" : "avatar-edit"}>
+                <label
+                  className={
+                    isUploadingAvatar
+                      ? "avatar-edit is-uploading"
+                      : "avatar-edit"
+                  }
+                >
                   {isUploadingAvatar ? "Uploading..." : "Update photo"}
                   <input
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
                     onChange={(event) => {
-                      const file = event.target.files?.[0];
-                      event.target.value = "";
-                      if (file) setMediaCrop({ file, kind: "avatar" });
+                      const file = event.target.files?.[0]
+                      event.target.value = ""
+                      if (file) setMediaCrop({ file, kind: "avatar" })
                     }}
                     disabled={isUploadingAvatar}
                   />
@@ -991,10 +1183,18 @@ export default function App() {
               )}
             </div>
             <div className="identity-copy">
-              <div className="name-line"><h1> Maria / RIA </h1></div>
-              <p className="location"><span>🇵🇭</span> Cavite, Philippines</p>
-              <p className="bio"> Player · Introvert · Explorer</p>
-              {isOwner && avatarStatus && <p className="avatar-status" role="status">{avatarStatus}</p>}
+              <div className="name-line">
+                <h1>Maria / RIA</h1>
+              </div>
+              <p className="location">
+                <span>🇵🇭</span> Cavite, Philippines
+              </p>
+              <p className="bio">Player · Introvert · Explorer</p>
+              {isOwner && avatarStatus && (
+                <p className="avatar-status" role="status">
+                  {avatarStatus}
+                </p>
+              )}
             </div>
           </div>
 
@@ -1028,19 +1228,21 @@ export default function App() {
           <span>Ria Ellaine · Public Profile</span>
           <span>
             For inquiries, contact me at{" "}
-            <a href="mailto:maellainebejerano@gmail.com">maellainebejerano@gmail.com</a>
+            <a href="mailto:maellainebejerano@gmail.com">
+              maellainebejerano@gmail.com
+            </a>
           </span>
           <button
             className="owner-access"
             type="button"
             onClick={() => {
               if (isOwner) {
-                sessionStorage.removeItem("profile-owner-password");
-                setOwnerPassword(null);
-                setIsOwner(false);
-                setAvatarStatus("");
+                sessionStorage.removeItem("profile-owner-password")
+                setOwnerPassword(null)
+                setIsOwner(false)
+                setAvatarStatus("")
               } else {
-                setShowOwnerLogin(true);
+                setShowOwnerLogin(true)
               }
             }}
           >
@@ -1051,7 +1253,12 @@ export default function App() {
 
       {showOwnerLogin && (
         <div className="owner-modal-backdrop" role="presentation">
-          <section className="owner-modal" role="dialog" aria-modal="true" aria-labelledby="owner-login-title">
+          <section
+            className="owner-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="owner-login-title"
+          >
             <button
               className="owner-modal-close"
               type="button"
@@ -1074,7 +1281,11 @@ export default function App() {
               />
               <button type="submit">Unlock</button>
             </form>
-            {avatarStatus && <p className="owner-feedback" role="status">{avatarStatus}</p>}
+            {avatarStatus && (
+              <p className="owner-feedback" role="status">
+                {avatarStatus}
+              </p>
+            )}
           </section>
         </div>
       )}
@@ -1082,19 +1293,23 @@ export default function App() {
         <ImageCropModal
           file={mediaCrop.file}
           aspectRatio={mediaCrop.kind === "avatar" ? 1 : 19 / 6}
-          title={mediaCrop.kind === "avatar" ? "Adjust profile picture" : "Adjust cover photo"}
+          title={
+            mediaCrop.kind === "avatar"
+              ? "Adjust profile picture"
+              : "Adjust cover photo"
+          }
           onCancel={() => setMediaCrop(null)}
           onConfirm={(file) => {
-            const kind = mediaCrop.kind;
-            setMediaCrop(null);
+            const kind = mediaCrop.kind
+            setMediaCrop(null)
             if (kind === "avatar") {
-              updateAvatar(file);
+              updateAvatar(file)
             } else {
-              updateCover(file);
+              updateCover(file)
             }
           }}
         />
       )}
     </div>
-  );
+  )
 }
