@@ -738,9 +738,10 @@ function VisitorCounter({
   ownerPassword: string | null
   isOwner: boolean
 }) {
-  const [stats, setStats] = useState<{ total: number unique: number } | null>(
-    null,
-  )
+  const [stats, setStats] = useState<{
+    total: number
+    unique: number
+  } | null>(null)
   const [log, setLog] = useState<VisitLogEntry[]>([])
   const [open, setOpen] = useState(false)
 
