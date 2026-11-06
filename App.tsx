@@ -341,7 +341,7 @@ function OverviewPanel() {
       <div className="game-row">
         <div>
           <span className="overline">Current status</span>
-          <strong>Exploring and balancing everything</strong>
+          <strong>StuDYING</strong>
         </div>
         <span className="rank-badge">@2026</span>
       </div>
@@ -1185,12 +1185,12 @@ export default function App() {
             </div>
             <div className="identity-copy">
               <div className="name-line">
-                <h1>Maria / RIA</h1>
+                <h1>Maria | RIA</h1>
               </div>
               <p className="location">
                 <span>🇵🇭</span> Cavite, Philippines
               </p>
-              <p className="bio">Player · Introvert · Explorer</p>
+              <p className="bio">Married · Sleepyhead </p>
               {isOwner && avatarStatus && (
                 <p className="avatar-status" role="status">
                   {avatarStatus}
