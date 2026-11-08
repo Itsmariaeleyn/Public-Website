@@ -657,7 +657,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
   transform: translateY(0);
 }
 
-.cover-owner-tools button {
+.cover-owner-tools button,
+.cover-owner-tools label {
   border: 1px solid rgba(255,255,255,.4);
   border-radius: 999px;
   padding: .55rem .75rem;
@@ -672,19 +673,23 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .cover-owner-tools button:hover:not(:disabled),
-.cover-owner-tools button:focus-visible {
+.cover-owner-tools button:focus-visible,
+.cover-owner-tools label:hover,
+.cover-owner-tools label:focus-within {
   border-color: rgba(255,255,255,.72);
   background: rgba(61, 91, 132, .92);
   box-shadow: 0 0 18px rgba(167, 201, 255, .18);
 }
 
 .cover-owner-tools button.is-uploading,
-.cover-owner-tools button:disabled {
+.cover-owner-tools button:disabled,
+.cover-owner-tools label.is-uploading {
   cursor: wait;
   opacity: .7;
 }
 
-.cover-file-input {
+.cover-file-input,
+.cover-owner-tools input {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -1984,6 +1989,7 @@ footer a:hover {
 }
 
 .site-shell[data-theme="light"] .cover-owner-tools button,
+.site-shell[data-theme="light"] .cover-owner-tools label,
 .site-shell[data-theme="light"] .cover-owner-tools > span {
   border-color: rgba(255,255,255,.65);
   background: rgba(41, 69, 99, .76);
